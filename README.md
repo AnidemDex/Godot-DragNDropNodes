@@ -2,4 +2,4 @@
 
 This plugin let you drag nodes from a panel in left dock to your current edited scene tree.
 
-https://github.com/AnidemDex/Godot-DragNDropNodes/raw/refs/heads/main/.multimedia/demo.mp4
+![Video](https://github.com/AnidemDex/Godot-DragNDropNodes/raw/refs/heads/main/.multimedia/demo.mp4)
