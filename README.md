@@ -45,7 +45,7 @@ if there is any bugs or problems please add it in the Issues section
 Pending
 
 # Contributors
-## <the Dex @AnidemDex>
-## <whoKarez @0whokarez0>
-## <deadBunny @ideadBunny>
+- AnidemDex (@AnidemDex)
+- whoKarez (@0whokarez0)
+- deadBunny (@ideadBunny)
 
