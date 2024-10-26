@@ -75,7 +75,7 @@ func generate_class_tree() -> void:
 	# Create the root item
 	root = tree.create_item()
 	root.set_text(0, "Nodes")
-	root.set_icon(0, editor_theme.get_icon("Node", "EditorIcons"))
+	root.set_icon(0, editor_theme.get_icon("Sprite2D", "EditorIcons"))
 
 	# Create section headers under the root
 	var root_2d = tree.create_item(root)
