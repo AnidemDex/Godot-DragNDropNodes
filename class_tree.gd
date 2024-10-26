@@ -59,6 +59,8 @@ func generate_full_node_list() -> void:
 			continue
 		if _class_name == "Node":
 			continue
+		if not ClassDB.can_instantiate(_class_name):
+			continue  # Exclude non-instantiable classes
 
 		full_node_list.append(_class_name)
 
