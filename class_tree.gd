@@ -2,11 +2,12 @@
 class_name ClassTree
 extends VBoxContainer
 
+# Variable Declarations
 var root: TreeItem
 var editor_interface: EditorInterface  # Reference to the EditorInterface
 var search_bar: LineEdit              # The search bar
 var tree: Tree                        # The tree displaying nodes
-var full_node_list: Array             # Full list of node classes
+var full_node_list: Array = []        # Full list of node classes
 
 func _init(_editor_interface: EditorInterface) -> void:
 	editor_interface = _editor_interface
@@ -15,25 +16,25 @@ func _init(_editor_interface: EditorInterface) -> void:
 	# Initialize the search bar
 	search_bar = LineEdit.new()
 	search_bar.placeholder_text = "Search Nodes..."
+	search_bar.clear_button_enabled = true  # Enable the clear button
 	add_child(search_bar)
 
-	# Connect the text_changed signal using Godot 4 syntax
-	search_bar.text_changed.connect(_on_search_text_changed)
+	# Connect the text_changed signal
+	search_bar.text_changed.connect(self._on_search_text_changed)
 
 	# Initialize the tree
 	tree = Tree.new()
 
 	# Set the tree to expand vertically
 	tree.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	# Optionally, set horizontal size flags if needed
 	tree.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 
 	add_child(tree)
-	tree.item_selected.connect(_item_selected)
-	tree.gui_input.connect(_on_tree_gui_input)
+
+	# Connect to 'item_activated' signal
+	tree.item_activated.connect(self._on_item_activated)
 
 	# Generate the full node list
-	full_node_list = []
 	generate_full_node_list()
 
 	# Generate the class tree initially
@@ -41,6 +42,7 @@ func _init(_editor_interface: EditorInterface) -> void:
 
 func generate_full_node_list() -> void:
 	# Generate the full list of node classes once
+	full_node_list.clear()  # Ensure the list is empty before populating
 	var node_classes = ClassDB.get_inheriters_from_class("Node")
 
 	for _class_name in node_classes:
@@ -91,10 +93,10 @@ func generate_class_tree() -> void:
 	root_all.set_icon(0, editor_theme.get_icon("Node", "EditorIcons"))
 
 	# Initialize arrays to hold classes for each section
-	var nodes_2d = []
-	var nodes_3d = []
-	var nodes_misc = []
-	var nodes_all = []
+	var nodes_2d: Array = []
+	var nodes_3d: Array = []
+	var nodes_misc: Array = []
+	var nodes_all: Array = []
 
 	# Get the search text
 	var search_text = search_bar.text.strip_edges().to_lower()
@@ -132,25 +134,31 @@ func create_tree_items(class_list: Array, parent_item: TreeItem, editor_theme: T
 		class_item.set_icon(0, class_icon)
 		class_item.set_selectable(0, ClassDB.can_instantiate(_class_name))
 
-func _item_selected() -> void:
+func _on_item_activated() -> void:
 	var item = tree.get_selected()
 	if item == null:
 		return
-	var node: Node = ClassDB.instantiate(item.get_text(0)) as Node
+	print("Item activated:", item.get_text(0))
+	_create_node(item)
+
+func _create_node(item: TreeItem) -> void:
+	var node_type = item.get_text(0)
+	print("Creating node of type:", node_type)
+	var node: Node = ClassDB.instantiate(node_type) as Node
+	if node == null:
+		print("Failed to instantiate node of type:", node_type)
+		return
 	var scene_root = editor_interface.get_edited_scene_root()
 	if scene_root == null:
+		print("No scene root found")
 		return
 	scene_root.add_child(node, true)
 	node.owner = scene_root
-	item.set_metadata(0, node.get_path())
 	var selection: EditorSelection = editor_interface.get_selection()
 	selection.clear()
 	selection.add_node(node)
+	print("Node created and added to the scene.")
 
 func _on_search_text_changed(new_text: String) -> void:
 	# Regenerate the class tree whenever the search text changes
 	generate_class_tree()
-
-func _on_tree_gui_input(event: InputEvent) -> void:
-	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.doubleclick:
-		_item_selected()
