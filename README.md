@@ -44,17 +44,8 @@ if there is any bugs or problems please add it in the Issues section
 ### AssetLib
 Pending
 
-Contributors  :
-
-# TheDex 
-as the first programmer
-discord: @anidemdex , github: @AnidemDex
-
-# jam abusheira 
-as designer and debugger 
-discord:@0whocarez0 , github: @0whokarez0 
-
-# dead bunny 
-as the git expert 
-discord: @ideadbunny , github:@ideadBunny
+# Contributors
+## <the Dex @AnidemDex>
+## <whoKarez @0whokarez0>
+## <deadBunny @ideadBunny>
 
