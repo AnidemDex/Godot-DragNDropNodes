@@ -21,7 +21,7 @@ This plugin let you drag nodes from a panel in left dock to your current edited 
 2. Extract the folder under your `res://addons` folder
 3. Go to `Project->ProjectSettings->Plugins` and enable `Drag Nodes to Scene`
 4. (make sure there is a folder named "Godot-DragNDropNodes-main" under the addons folder then put the files inside it ,
-cuz if you put them directly into addons folder it wont show up in the plugins menu 
+cuz if you put them directly into addons folder it wont show up in the plugins menu (any folder name will do ) 
 
 ### Git install
 If you're using git in your project, you can install this plugin as submodule:
