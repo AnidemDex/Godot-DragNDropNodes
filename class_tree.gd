@@ -12,9 +12,10 @@ func _init(_editor_interface: EditorInterface) -> void:
 	editor_interface = _editor_interface
 	name = "Nodes"
 
-	# Initialize the search bar
+# Initialize the search bar
 	search_bar = LineEdit.new()
 	search_bar.placeholder_text = "Search Nodes..."
+	search_bar.clear_button_enabled = true  # Enable the clear button
 	add_child(search_bar)
 
 	# Connect the text_changed signal using Godot 4 syntax
