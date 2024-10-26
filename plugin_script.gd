@@ -2,7 +2,7 @@
 extends EditorPlugin
 
 var class_tree
-const ClassTree = preload("res://addons/Godot-DragNDropNodes-main/class_tree.gd")  # Update the path if necessary
+const ClassTree = preload("./class_tree.gd") 
 
 func _enter_tree() -> void:
 	class_tree = ClassTree.new(get_editor_interface())
