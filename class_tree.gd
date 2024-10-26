@@ -13,7 +13,7 @@ func _init(_editor_interface: EditorInterface) -> void:
 	editor_interface = _editor_interface
 	name = "Nodes"
 
-# Initialize the search bar
+	# Initialize the search bar
 	search_bar = LineEdit.new()
 	search_bar.placeholder_text = "Search Nodes..."
 	search_bar.clear_button_enabled = true  # Enable the clear button
@@ -81,18 +81,22 @@ func generate_class_tree() -> void:
 	var root_2d = tree.create_item(root)
 	root_2d.set_text(0, "2D Nodes")
 	root_2d.set_icon(0, editor_theme.get_icon("Node2D", "EditorIcons"))
+	root_2d.set_collapsed(true) # Start collapsed
 
 	var root_3d = tree.create_item(root)
 	root_3d.set_text(0, "3D Nodes")
 	root_3d.set_icon(0, editor_theme.get_icon("Node3D", "EditorIcons"))
+	root_3d.set_collapsed(true) # Start collapsed
 
 	var root_misc = tree.create_item(root)
 	root_misc.set_text(0, "Misc")
-	root_misc.set_icon(0, editor_theme.get_icon("Node", "EditorIcons"))
+	root_misc.set_icon(0, editor_theme.get_icon("Control", "EditorIcons"))
+	root_misc.set_collapsed(true) # Start collapsed
 
 	var root_all = tree.create_item(root)
 	root_all.set_text(0, "All Nodes")
 	root_all.set_icon(0, editor_theme.get_icon("Node", "EditorIcons"))
+	root_all.set_collapsed(true) # Start collapsed
 
 	# Initialize arrays to hold classes for each section
 	var nodes_2d: Array = []
