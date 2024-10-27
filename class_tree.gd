@@ -76,6 +76,7 @@ func generate_class_tree() -> void:
 	root = tree.create_item()
 	root.set_text(0, "Nodes")
 	root.set_icon(0, editor_theme.get_icon("Sprite2D", "EditorIcons"))
+	root.set_disable_folding(true)  # Disable folding for the root item
 
 	# Create section headers under the root
 	var root_2d = tree.create_item(root)
