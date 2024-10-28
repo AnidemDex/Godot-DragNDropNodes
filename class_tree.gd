@@ -53,7 +53,11 @@ func generate_full_node_list() -> void:
 		if _class_name == "Node":
 			if ClassDB.can_instantiate(_class_name) and ClassDB.is_class_enabled(_class_name):
 				full_node_list.append(_class_name)
-				print("Included class:", _class_name)
+			continue
+
+		# **Exclude "MissingNode"**
+		if _class_name == "MissingNode":
+			print("Excluding MissingNode")
 			continue
 
 		# Apply filters to exclude unwanted classes
@@ -82,15 +86,14 @@ func generate_full_node_list() -> void:
 
 	# Sort the full list alphabetically, except 'Node'
 	full_node_list.sort()
-	print("Full node list after sorting (excluding 'Node'):", full_node_list)
+
 
 	# Move 'Node' to the top of the list
 	if "Node" in full_node_list:
 		full_node_list.erase("Node")
 		full_node_list.insert(0, "Node")
-		print("Moved 'Node' to the top of the full node list.")
 
-	print("Final full_node_list:", full_node_list)
+
 
 func generate_class_tree() -> void:
 	tree.clear()
@@ -152,15 +155,15 @@ func generate_class_tree() -> void:
 		else:
 			nodes_misc.append(_class_name)
 
-	print("Nodes All before sorting:", nodes_all)
+
 
 	# **Move "Node" to the top of "All Nodes"**
 	if "Node" in nodes_all:
 		nodes_all.erase("Node")
 		nodes_all.insert(0, "Node")
-		print("Moved 'Node' to the top of All Nodes")
 
-	print("Nodes All after sorting:", nodes_all)
+
+
 
 	# Populate each section with its classes
 	create_tree_items(nodes_2d, root_2d, editor_theme)
