@@ -25,7 +25,7 @@ func _init(_editor_interface: EditorInterface) -> void:
 	# Initialize the tree
 	tree = Tree.new()
 
-	# Set the tree to expand vertically
+	# Set the tree to expand vertically and horizontally
 	tree.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	tree.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 
@@ -44,59 +44,100 @@ func generate_full_node_list() -> void:
 	# Generate the full list of node classes once
 	full_node_list.clear()  # Ensure the list is empty before populating
 	var node_classes = ClassDB.get_inheriters_from_class("Node")
+	node_classes.append("Node")  # Manually add "Node"
+
+	print("Total inheriters from Node (including 'Node'):", node_classes.size())
 
 	for _class_name in node_classes:
+		# Always include "Node"
+		if _class_name == "Node":
+			if ClassDB.can_instantiate(_class_name) and ClassDB.is_class_enabled(_class_name):
+				full_node_list.append(_class_name)
+				print("Included class:", _class_name)
+			continue
+
+		# **Exclude "MissingNode"**
+		if _class_name == "MissingNode":
+			print("Excluding MissingNode")
+			continue
+
 		# Apply filters to exclude unwanted classes
 		if "Editor" in _class_name:
+			print("Excluding (Editor) class:", _class_name)
 			continue
 		if _class_name == "ScriptCreateDialog":
+			print("Excluding ScriptCreateDialog")
 			continue
 		if not ClassDB.is_parent_class(_class_name, "Node"):
+			print("Excluding (Not inheriting Node):", _class_name)
 			continue
+		# Exclude subclasses of Node
 		if ClassDB.is_parent_class("Node", _class_name):
+			print("Excluding (Subclass of Node):", _class_name)
 			continue
 		if not ClassDB.is_class_enabled(_class_name):
-			continue
-		if _class_name == "Node":
+			print("Excluding (Class Disabled):", _class_name)
 			continue
 		if not ClassDB.can_instantiate(_class_name):
+			print("Excluding (Cannot Instantiate):", _class_name)
 			continue  # Exclude non-instantiable classes
 
 		full_node_list.append(_class_name)
+		print("Included class:", _class_name)
 
-	# Sort the full list alphabetically
+	# Sort the full list alphabetically, except 'Node'
 	full_node_list.sort()
+	
+
+	# Move 'Node' to the top of the list
+	if "Node" in full_node_list:
+		full_node_list.erase("Node")
+		full_node_list.insert(0, "Node")
+		print("Moved 'Node' to the top of the full node list.")
+
+
 
 func generate_class_tree() -> void:
 	tree.clear()
 
 	var editor_theme: Theme = editor_interface.get_editor_theme()
 
+	# Determine if a search query is active
+	var search_text = search_bar.text.strip_edges().to_lower()
+	var is_search_active = search_text != ""
+
+	print("Search Text:", search_text)
+	print("Is Search Active:", is_search_active)
+
+	# Decide the collapsed state based on search activity
+	var collapsed_state = not is_search_active  # True if no search, False if search is active
+
 	# Create the root item
 	root = tree.create_item()
 	root.set_text(0, "Nodes")
 	root.set_icon(0, editor_theme.get_icon("Sprite2D", "EditorIcons"))
+	root.set_disable_folding(true)  # Disable folding for the root item
 
-	# Create section headers under the root
+	# Create section headers under the root with dynamic collapsed state
 	var root_2d = tree.create_item(root)
 	root_2d.set_text(0, "2D Nodes")
 	root_2d.set_icon(0, editor_theme.get_icon("Node2D", "EditorIcons"))
-	root_2d.set_collapsed(true) # Start collapsed
+	root_2d.set_collapsed(collapsed_state) # Dynamic collapsed state
 
 	var root_3d = tree.create_item(root)
 	root_3d.set_text(0, "3D Nodes")
 	root_3d.set_icon(0, editor_theme.get_icon("Node3D", "EditorIcons"))
-	root_3d.set_collapsed(true) # Start collapsed
+	root_3d.set_collapsed(collapsed_state) # Dynamic collapsed state
 
 	var root_misc = tree.create_item(root)
 	root_misc.set_text(0, "Misc")
 	root_misc.set_icon(0, editor_theme.get_icon("Control", "EditorIcons"))
-	root_misc.set_collapsed(true) # Start collapsed
+	root_misc.set_collapsed(collapsed_state) # Dynamic collapsed state
 
 	var root_all = tree.create_item(root)
 	root_all.set_text(0, "All Nodes")
 	root_all.set_icon(0, editor_theme.get_icon("Node", "EditorIcons"))
-	root_all.set_collapsed(true) # Start collapsed
+	root_all.set_collapsed(collapsed_state) # Dynamic collapsed state
 
 	# Initialize arrays to hold classes for each section
 	var nodes_2d: Array = []
@@ -104,13 +145,11 @@ func generate_class_tree() -> void:
 	var nodes_misc: Array = []
 	var nodes_all: Array = []
 
-	# Get the search text
-	var search_text = search_bar.text.strip_edges().to_lower()
-
 	# Filter the full node list based on the search text
 	for _class_name in full_node_list:
 		# If there's a search query, filter the classes
-		if search_text != "" and not _class_name.to_lower().findn(search_text) != -1:
+		if is_search_active and _class_name.to_lower().find(search_text) == -1:
+			print("Filtering out:", _class_name, "due to search")
 			continue
 
 		# Add to 'All Nodes' section
@@ -124,11 +163,24 @@ func generate_class_tree() -> void:
 		else:
 			nodes_misc.append(_class_name)
 
+
+
+	# **Move "Node" to the top of "All Nodes"**
+	if "Node" in nodes_all:
+		nodes_all.erase("Node")
+		nodes_all.insert(0, "Node")
+		print("Moved 'Node' to the top of All Nodes")
+
+
+
 	# Populate each section with its classes
 	create_tree_items(nodes_2d, root_2d, editor_theme)
 	create_tree_items(nodes_3d, root_3d, editor_theme)
 	create_tree_items(nodes_misc, root_misc, editor_theme)
 	create_tree_items(nodes_all, root_all, editor_theme)
+
+	print("Class tree generation completed.")
+
 
 func create_tree_items(class_list: Array, parent_item: TreeItem, editor_theme: Theme) -> void:
 	for _class_name in class_list:
