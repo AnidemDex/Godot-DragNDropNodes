@@ -8,6 +8,13 @@ var editor_interface: EditorInterface  # Reference to the EditorInterface
 var search_bar: LineEdit              # The search bar
 var tree: Tree                        # The tree displaying nodes
 var full_node_list: Array = []        # Full list of node classes
+var root_items_collapsed_state = {
+	"2D Nodes": true,
+	"3D Nodes": true,
+	"Misc": true,
+	"All Nodes": true,
+}
+var is_search_active = false
 
 func _init(_editor_interface: EditorInterface) -> void:
 	editor_interface = _editor_interface
@@ -33,6 +40,8 @@ func _init(_editor_interface: EditorInterface) -> void:
 
 	# Connect to 'item_activated' signal
 	tree.item_activated.connect(self._on_item_activated)
+	# Connect to 'item_collapsed' signal
+	tree.item_collapsed.connect(self._on_item_collapsed)
 
 	# Generate the full node list
 	generate_full_node_list()
@@ -56,7 +65,7 @@ func generate_full_node_list() -> void:
 				#print("Included class:", _class_name)
 			continue
 
-		# **Exclude "MissingNode"**
+		# Exclude "MissingNode"
 		if _class_name == "MissingNode":
 			#print("Excluding MissingNode")
 			continue
@@ -87,15 +96,12 @@ func generate_full_node_list() -> void:
 
 	# Sort the full list alphabetically, except 'Node'
 	full_node_list.sort()
-	
 
 	# Move 'Node' to the top of the list
 	if "Node" in full_node_list:
 		full_node_list.erase("Node")
 		full_node_list.insert(0, "Node")
 		#print("Moved 'Node' to the top of the full node list.")
-
-
 
 func generate_class_tree() -> void:
 	tree.clear()
@@ -104,13 +110,10 @@ func generate_class_tree() -> void:
 
 	# Determine if a search query is active
 	var search_text = search_bar.text.strip_edges().to_lower()
-	var is_search_active = search_text != ""
+	is_search_active = search_text != ""
 
 	#print("Search Text:", search_text)
 	#print("Is Search Active:", is_search_active)
-
-	# Decide the collapsed state based on search activity
-	var collapsed_state = not is_search_active  # True if no search, False if search is active
 
 	# Create the root item
 	root = tree.create_item()
@@ -118,26 +121,38 @@ func generate_class_tree() -> void:
 	root.set_icon(0, editor_theme.get_icon("Sprite2D", "EditorIcons"))
 	root.set_disable_folding(true)  # Disable folding for the root item
 
-	# Create section headers under the root with dynamic collapsed state
+	# Create section headers under the root
 	var root_2d = tree.create_item(root)
 	root_2d.set_text(0, "2D Nodes")
 	root_2d.set_icon(0, editor_theme.get_icon("Node2D", "EditorIcons"))
-	root_2d.set_collapsed(collapsed_state) # Dynamic collapsed state
+	if is_search_active:
+		root_2d.set_collapsed(false)  # Expand during search
+	else:
+		root_2d.set_collapsed(root_items_collapsed_state.get("2D Nodes", true))
 
 	var root_3d = tree.create_item(root)
 	root_3d.set_text(0, "3D Nodes")
 	root_3d.set_icon(0, editor_theme.get_icon("Node3D", "EditorIcons"))
-	root_3d.set_collapsed(collapsed_state) # Dynamic collapsed state
+	if is_search_active:
+		root_3d.set_collapsed(false)  # Expand during search
+	else:
+		root_3d.set_collapsed(root_items_collapsed_state.get("3D Nodes", true))
 
 	var root_misc = tree.create_item(root)
 	root_misc.set_text(0, "Misc")
 	root_misc.set_icon(0, editor_theme.get_icon("Control", "EditorIcons"))
-	root_misc.set_collapsed(collapsed_state) # Dynamic collapsed state
+	if is_search_active:
+		root_misc.set_collapsed(false)  # Expand during search
+	else:
+		root_misc.set_collapsed(root_items_collapsed_state.get("Misc", true))
 
 	var root_all = tree.create_item(root)
 	root_all.set_text(0, "All Nodes")
 	root_all.set_icon(0, editor_theme.get_icon("Node", "EditorIcons"))
-	root_all.set_collapsed(collapsed_state) # Dynamic collapsed state
+	if is_search_active:
+		root_all.set_collapsed(false)  # Expand during search
+	else:
+		root_all.set_collapsed(root_items_collapsed_state.get("All Nodes", true))
 
 	# Initialize arrays to hold classes for each section
 	var nodes_2d: Array = []
@@ -163,15 +178,11 @@ func generate_class_tree() -> void:
 		else:
 			nodes_misc.append(_class_name)
 
-
-
-	# **Move "Node" to the top of "All Nodes"**
+	# Move "Node" to the top of "All Nodes"
 	if "Node" in nodes_all:
 		nodes_all.erase("Node")
 		nodes_all.insert(0, "Node")
 		#print("Moved 'Node' to the top of All Nodes")
-
-
 
 	# Populate each section with its classes
 	create_tree_items(nodes_2d, root_2d, editor_theme)
@@ -180,7 +191,6 @@ func generate_class_tree() -> void:
 	create_tree_items(nodes_all, root_all, editor_theme)
 
 	#print("Class tree generation completed.")
-
 
 func create_tree_items(class_list: Array, parent_item: TreeItem, editor_theme: Theme) -> void:
 	for _class_name in class_list:
@@ -229,3 +239,8 @@ func _create_node(item: TreeItem) -> void:
 func _on_search_text_changed(new_text: String) -> void:
 	# Regenerate the class tree whenever the search text changes
 	generate_class_tree()
+
+func _on_item_collapsed(item: TreeItem) -> void:
+	var item_text = item.get_text(0)
+	if item_text in ["2D Nodes", "3D Nodes", "Misc", "All Nodes"]:
+		root_items_collapsed_state[item_text] = item.is_collapsed()
