@@ -207,8 +207,17 @@ func _create_node(item: TreeItem) -> void:
 		print("Failed to instantiate node of type:", node_type)
 		return
 	var scene_root = editor_interface.get_edited_scene_root()
-	if scene_root == null:
+	
+	if not is_instance_valid(scene_root):
 		print("No scene root found")
+		var tree_editor = Engine.get_meta("SceneTreeEditor", null)
+		var editor_node = Engine.get_meta("EditorNode", null)
+		if not is_instance_valid(tree_editor) or not is_instance_valid(editor_node):
+			print("Can't create new scene root")
+			node.free() # avoid leaked instance
+			return
+		editor_node.call("set_edited_scene", node)
+		tree_editor.call("update_tree")
 		return
 	scene_root.add_child(node, true)
 	node.owner = scene_root
