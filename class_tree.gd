@@ -46,44 +46,44 @@ func generate_full_node_list() -> void:
 	var node_classes = ClassDB.get_inheriters_from_class("Node")
 	node_classes.append("Node")  # Manually add "Node"
 
-	print("Total inheriters from Node (including 'Node'):", node_classes.size())
+	#print("Total inheriters from Node (including 'Node'):", node_classes.size())
 
 	for _class_name in node_classes:
 		# Always include "Node"
 		if _class_name == "Node":
 			if ClassDB.can_instantiate(_class_name) and ClassDB.is_class_enabled(_class_name):
 				full_node_list.append(_class_name)
-				print("Included class:", _class_name)
+				#print("Included class:", _class_name)
 			continue
 
 		# **Exclude "MissingNode"**
 		if _class_name == "MissingNode":
-			print("Excluding MissingNode")
+			#print("Excluding MissingNode")
 			continue
 
 		# Apply filters to exclude unwanted classes
 		if "Editor" in _class_name:
-			print("Excluding (Editor) class:", _class_name)
+			#print("Excluding (Editor) class:", _class_name)
 			continue
 		if _class_name == "ScriptCreateDialog":
-			print("Excluding ScriptCreateDialog")
+			#print("Excluding ScriptCreateDialog")
 			continue
 		if not ClassDB.is_parent_class(_class_name, "Node"):
-			print("Excluding (Not inheriting Node):", _class_name)
+			#print("Excluding (Not inheriting Node):", _class_name)
 			continue
 		# Exclude subclasses of Node
 		if ClassDB.is_parent_class("Node", _class_name):
-			print("Excluding (Subclass of Node):", _class_name)
+			#print("Excluding (Subclass of Node):", _class_name)
 			continue
 		if not ClassDB.is_class_enabled(_class_name):
-			print("Excluding (Class Disabled):", _class_name)
+			#print("Excluding (Class Disabled):", _class_name)
 			continue
 		if not ClassDB.can_instantiate(_class_name):
-			print("Excluding (Cannot Instantiate):", _class_name)
+			#print("Excluding (Cannot Instantiate):", _class_name)
 			continue  # Exclude non-instantiable classes
 
 		full_node_list.append(_class_name)
-		print("Included class:", _class_name)
+		#print("Included class:", _class_name)
 
 	# Sort the full list alphabetically, except 'Node'
 	full_node_list.sort()
@@ -93,7 +93,7 @@ func generate_full_node_list() -> void:
 	if "Node" in full_node_list:
 		full_node_list.erase("Node")
 		full_node_list.insert(0, "Node")
-		print("Moved 'Node' to the top of the full node list.")
+		#print("Moved 'Node' to the top of the full node list.")
 
 
 
@@ -106,8 +106,8 @@ func generate_class_tree() -> void:
 	var search_text = search_bar.text.strip_edges().to_lower()
 	var is_search_active = search_text != ""
 
-	print("Search Text:", search_text)
-	print("Is Search Active:", is_search_active)
+	#print("Search Text:", search_text)
+	#print("Is Search Active:", is_search_active)
 
 	# Decide the collapsed state based on search activity
 	var collapsed_state = not is_search_active  # True if no search, False if search is active
@@ -149,7 +149,7 @@ func generate_class_tree() -> void:
 	for _class_name in full_node_list:
 		# If there's a search query, filter the classes
 		if is_search_active and _class_name.to_lower().find(search_text) == -1:
-			print("Filtering out:", _class_name, "due to search")
+			#print("Filtering out:", _class_name, "due to search")
 			continue
 
 		# Add to 'All Nodes' section
@@ -169,7 +169,7 @@ func generate_class_tree() -> void:
 	if "Node" in nodes_all:
 		nodes_all.erase("Node")
 		nodes_all.insert(0, "Node")
-		print("Moved 'Node' to the top of All Nodes")
+		#print("Moved 'Node' to the top of All Nodes")
 
 
 
@@ -179,7 +179,7 @@ func generate_class_tree() -> void:
 	create_tree_items(nodes_misc, root_misc, editor_theme)
 	create_tree_items(nodes_all, root_all, editor_theme)
 
-	print("Class tree generation completed.")
+	#print("Class tree generation completed.")
 
 
 func create_tree_items(class_list: Array, parent_item: TreeItem, editor_theme: Theme) -> void:
@@ -196,24 +196,24 @@ func _on_item_activated() -> void:
 	var item = tree.get_selected()
 	if item == null:
 		return
-	print("Item activated:", item.get_text(0))
+	#print("Item activated:", item.get_text(0))
 	_create_node(item)
 
 func _create_node(item: TreeItem) -> void:
 	var node_type = item.get_text(0)
-	print("Creating node of type:", node_type)
+	#print("Creating node of type:", node_type)
 	var node: Node = ClassDB.instantiate(node_type) as Node
 	if node == null:
-		print("Failed to instantiate node of type:", node_type)
+		#print("Failed to instantiate node of type:", node_type)
 		return
 	var scene_root = editor_interface.get_edited_scene_root()
 	
 	if not is_instance_valid(scene_root):
-		print("No scene root found")
+		#print("No scene root found")
 		var tree_editor = Engine.get_meta("SceneTreeEditor", null)
 		var editor_node = Engine.get_meta("EditorNode", null)
 		if not is_instance_valid(tree_editor) or not is_instance_valid(editor_node):
-			print("Can't create new scene root")
+			#print("Can't create new scene root")
 			node.free() # avoid leaked instance
 			return
 		editor_node.call("set_edited_scene", node)
@@ -224,7 +224,7 @@ func _create_node(item: TreeItem) -> void:
 	var selection: EditorSelection = editor_interface.get_selection()
 	selection.clear()
 	selection.add_node(node)
-	print("Node created and added to the scene.")
+	#print("Node created and added to the scene.")
 
 func _on_search_text_changed(new_text: String) -> void:
 	# Regenerate the class tree whenever the search text changes
