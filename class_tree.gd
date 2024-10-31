@@ -35,6 +35,7 @@ func _init(_editor_interface: EditorInterface) -> void:
 	# Set the tree to expand vertically and horizontally
 	tree.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	tree.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	tree.set_drag_forwarding(_get_drag_data_fw, Callable(), Callable())
 
 	add_child(tree)
 
@@ -201,6 +202,57 @@ func create_tree_items(class_list: Array, parent_item: TreeItem, editor_theme: T
 		class_item.set_text(0, _class_name)
 		class_item.set_icon(0, class_icon)
 		class_item.set_selectable(0, ClassDB.can_instantiate(_class_name))
+
+func _get_drag_data_fw(at_position: Vector2) -> Variant:
+	var current_scene = editor_interface.get_edited_scene_root()
+	if not is_instance_valid(current_scene):
+		return
+	
+	var item := tree.get_item_at_position(at_position)
+	if not item:
+		return
+	
+	var _class_name = item.get_text(0)
+	if _class_name.is_empty():
+		return
+	
+	if not ClassDB.can_instantiate(_class_name):
+		return
+	
+	var instance:Node = ClassDB.instantiate(_class_name) as Node
+	current_scene.add_child(instance, true)
+	instance.owner = current_scene
+	editor_interface.get_selection().clear()
+	editor_interface.get_selection().add_node(instance)
+	
+	var editor_theme = editor_interface.get_editor_theme()
+	var class_icon = editor_theme.get_icon("Node", "EditorIcons")
+	if editor_theme.has_icon(_class_name, "EditorIcons"):
+		class_icon = editor_theme.get_icon(_class_name, "EditorIcons")
+	
+	var hb  := HBoxContainer.new()
+	var tr := TextureRect.new()
+	var icon_size := get_theme_constant(&"class_icon_size", &"Editor")
+	tr.custom_minimum_size = Vector2i(icon_size, icon_size)
+	tr.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	tr.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	tr.texture = class_icon
+	hb.add_child(tr)
+	var label := Label.new()
+	label.text = _class_name
+	label.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
+	hb.add_child(label)
+	
+	var tree_editor = Engine.get_meta("SceneTreeEditor", null)
+	if is_instance_valid(tree_editor):
+		#var tree:Tree = tree_editor.call("get_scene_tree")
+		var tree:Tree = tree_editor.get_child(0) as Tree
+		if is_instance_valid(tree):
+			tree.drop_mode_flags = Tree.DROP_MODE_ON_ITEM | Tree.DROP_MODE_INBETWEEN
+			tree_editor.emit_signal("nodes_dragged")
+	
+	set_drag_preview(hb)
+	return {"type":"nodes", "nodes": [instance.get_path()]}
 
 func _on_item_activated() -> void:
 	var item = tree.get_selected()
