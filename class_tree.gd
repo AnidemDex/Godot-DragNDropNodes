@@ -110,7 +110,7 @@ func generate_class_tree() -> void:
 
 	var root_popular = tree.create_item(root)
 	root_popular.set_text(0, "Popular")
-	root_popular.set_icon(0, editor_theme.get_icon("Node2D", "EditorIcons"))
+	root_popular.set_icon(0, editor_theme.get_icon("RigidBody2D", "EditorIcons"))
 	if is_search_active:
 		root_popular.set_collapsed(false)
 	else:
