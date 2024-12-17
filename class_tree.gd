@@ -18,10 +18,11 @@ var root_items_collapsed_state = {
 var is_search_active = false
 
 # Define the list of popular nodes in the order you want them displayed.
-# Placing Node and Node2D at the top ensures they appear there in the UI.
 var popular_nodes = [
+	# Top nodes
 	"Node",
 	"Node2D",
+	# Previously added popular nodes
 	"RigidBody2D",
 	"CharacterBody2D",
 	"Sprite2D",
@@ -33,7 +34,16 @@ var popular_nodes = [
 	"Camera2D",
 	"CanvasLayer",
 	"Label",
-	"Panel"
+	"Panel",
+	# Newly added nodes
+	"ParallaxBackground",
+	"ParallaxLayer",
+	"Parallax2D",
+	"RayCast2D",
+	"Marker2D",
+	"Button",
+	"TextEdit",
+	"ColorRect"
 ]
 
 func _init(_editor_interface: EditorInterface) -> void:
@@ -108,9 +118,10 @@ func generate_class_tree() -> void:
 	root.set_icon(0, editor_theme.get_icon("Sprite2D", "EditorIcons"))
 	root.set_disable_folding(true)
 
+	# Change "Popular Nodes" to "Popular"
 	var root_popular = tree.create_item(root)
 	root_popular.set_text(0, "Popular")
-	root_popular.set_icon(0, editor_theme.get_icon("RigidBody2D", "EditorIcons"))
+	root_popular.set_icon(0, editor_theme.get_icon("Node2D", "EditorIcons"))
 	if is_search_active:
 		root_popular.set_collapsed(false)
 	else:
@@ -168,13 +179,12 @@ func generate_class_tree() -> void:
 		# Add to 'All Nodes' section
 		nodes_all.append(_class_name)
 
-		# Categorize based on class name
 		if "2D" in _class_name:
 			nodes_2d.append(_class_name)
 		elif "3D" in _class_name:
 			nodes_3d.append(_class_name)
 		else:
-			if _class_name not in popular_nodes: # Don't double-include popular in misc
+			if _class_name not in popular_nodes: # Avoid duplicating popular nodes in misc
 				nodes_misc.append(_class_name)
 
 	# Ensure "Node" is at the top of "All Nodes"
