@@ -390,9 +390,21 @@ func _create_node(item: TreeItem) -> void:
 	if node == null:
 		return
 	var scene_root = editor_interface.get_edited_scene_root()
-	if is_instance_valid(scene_root):
-		scene_root.add_child(node, true)
-		node.owner = scene_root
+	
+	if not is_instance_valid(scene_root):  # No root exists, set this node as root
+		var tree_editor = Engine.get_meta("SceneTreeEditor", null)
+		var editor_node = Engine.get_meta("EditorNode", null)
+		if not is_instance_valid(tree_editor) or not is_instance_valid(editor_node):
+			node.free()  # Avoid memory leak
+			return
+		editor_node.call("set_edited_scene", node)
+		tree_editor.call("update_tree")
+		return
+	
+	# Add the node to the existing scene
+	scene_root.add_child(node, true)
+	node.owner = scene_root
+
 
 func _on_item_collapsed(item: TreeItem) -> void:
 	var item_text = item.get_text(0)
