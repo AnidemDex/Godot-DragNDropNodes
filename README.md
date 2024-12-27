@@ -3,14 +3,8 @@
 This plugin let you drag nodes from a panel in left dock to your current edited scene tree.
 
 
-<video src="https://github.com/user-attachments/assets/73f2a4be-b4d2-4ec4-9a49-353e1660497a.mp4" controls="controls" muted="muted" class="d-block rounded-bottom-2 border-top width-fit" style="max-height:640px; min-height: 200px" __idm_id__="3186692">
 
-  </video>
-.
-<video src="https://github.com/user-attachments/assets/6fc1a449-d5ae-4a52-8b75-6fcdbc7eea9e.mp4" controls="controls" muted="muted" class="d-block rounded-bottom-2 border-top width-fit" style="max-height:640px; min-height: 200px" __idm_id__="3186692">
-
-  </video>
-
+https://github.com/user-attachments/assets/85668c4c-b617-47e6-ba46-ff38eb91572b
 
 
 
@@ -36,7 +30,8 @@ update log
 - fixed issue where u're not allowed to add the same node twice 
 - fixed issue where the catagory names where listed as nodes 
 - changed single click into a double click 
-- the drag n drop was enhanced but not finished yet so its still under development 
+- nodes now have a full description 
+- a new catagory was added (popular) for the nodes that are continuesly used by devs 
 ----------------------------
 
 if there is any bugs or problems please add it in the Issues section 
