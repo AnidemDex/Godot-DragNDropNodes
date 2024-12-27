@@ -322,6 +322,7 @@ func generate_full_node_list() -> void:
 		full_node_list.erase("Node")
 		full_node_list.insert(0, "Node")
 
+
 func generate_class_tree() -> void:
 	tree.clear()
 	var editor_theme: Theme = editor_interface.get_editor_theme()
@@ -353,15 +354,18 @@ func generate_class_tree() -> void:
 		var parent = tree.create_item(root)
 		parent.set_text(0, category)
 		parent.set_icon(0, editor_theme.get_icon(categories[category].icon, "EditorIcons"))
-		parent.set_collapsed(root_items_collapsed_state.get(category, true))
+		
+		# Ensure categories are expanded during a search
+		if is_search_active:
+			parent.set_collapsed(false)  # Expand the category
+		else:
+			parent.set_collapsed(root_items_collapsed_state.get(category, true))
 
 		for node_name in categories[category].nodes:
 			if is_search_active and node_name.to_lower().find(search_text) == -1:
 				continue
 			var description = descriptions.get(node_name, "No description available.")
 			create_tree_item(parent, node_name, editor_theme, description)
-
-
 
 
 
