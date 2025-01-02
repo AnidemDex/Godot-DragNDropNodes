@@ -280,7 +280,9 @@ var popular_nodes = [
 	"CollisionShape2D", "Area2D", "AnimationPlayer", "AnimatedSprite2D",
 	"StaticBody2D", "Camera2D", "CanvasLayer", "Label", "Panel",
 	"ParallaxBackground", "ParallaxLayer", "Parallax2D", "RayCast2D",
-	"Marker2D", "Button", "TextEdit", "ColorRect"
+	"Marker2D", "Button", "TextEdit", "ColorRect",
+	# Newly added nodes
+	"TileMap", "TileMapLayer", "Timer", "AudioStreamPlayer", "AudioStreamPlayer2D"
 ]
 
 func _init(_editor_interface: EditorInterface) -> void:
